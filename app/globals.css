@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f7fc;
+  --foreground: #0b1220;
+  --muted: #e9eef6;
+  --muted-foreground: #63748f;
+  --card: #ffffff;
+  --card-foreground: #0b1220;
+  --border: #d4deec;
+  --input: #fdfefe;
+  --ring: #10b981;
+  --soft-accent: #ecfeff;
+  --soft-accent-foreground: #0f766e;
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.5rem;
+  --shadow-sm: 0 2px 10px rgb(15 23 42 / 0.06);
+  --shadow-md: 0 16px 40px rgb(15 23 42 / 0.12);
+  --status-income-bg: #dcfce7;
+  --status-income-fg: #166534;
+  --status-expense-bg: #fee2e2;
+  --status-expense-fg: #991b1b;
+}
+
+:root[data-theme="dark"] {
+  --background: #060c17;
+  --foreground: #e5edf8;
+  --muted: #101a2b;
+  --muted-foreground: #8ea3c2;
+  --card: #0d1728;
+  --card-foreground: #e5edf8;
+  --border: #1b2a41;
+  --input: #0f1d31;
+  --ring: #34d399;
+  --soft-accent: rgb(20 184 166 / 0.15);
+  --soft-accent-foreground: #5eead4;
+  --shadow-sm: 0 4px 14px rgb(2 6 23 / 0.4);
+  --shadow-md: 0 20px 50px rgb(2 6 23 / 0.55);
+  --status-income-bg: rgb(34 197 94 / 0.18);
+  --status-income-fg: #86efac;
+  --status-expense-bg: rgb(239 68 68 / 0.2);
+  --status-expense-fg: #fca5a5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-soft-accent: var(--soft-accent);
+  --color-soft-accent-foreground: var(--soft-accent-foreground);
+  --color-status-income-bg: var(--status-income-bg);
+  --color-status-income-fg: var(--status-income-fg);
+  --color-status-expense-bg: var(--status-expense-bg);
+  --color-status-expense-fg: var(--status-expense-fg);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--ring) 16%, transparent) 0%, transparent 38%),
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--border) 60%, transparent) 0%, transparent 44%);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ring) 30%, transparent);
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted-foreground) 55%, transparent);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--muted-foreground) 75%, transparent);
+}
