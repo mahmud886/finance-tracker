@@ -1,0 +1,514 @@
+{
+  "info": {
+    "_postman_id": "2bfbb960-6d8a-4e93-aa41-8e2f45c6936c",
+    "name": "Finance Tracker API",
+    "description": "Postman collection for Finance Tracker Next.js API routes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const envBase = pm.environment.get('baseUrl');",
+          "const colBase = pm.collectionVariables.get('baseUrl');",
+          "let normalizedBase = envBase || colBase || 'http://localhost:3000/api/v1';",
+          "if (/\/api\/?$/i.test(normalizedBase)) normalizedBase = normalizedBase.replace(/\/?$/,'/v1');",
+          "if (!/\/api\/v1\/?$/i.test(normalizedBase)) normalizedBase = normalizedBase.replace(/\/?$/, '/api/v1');",
+          "pm.environment.set('baseUrl', normalizedBase);",
+          "pm.collectionVariables.set('baseUrl', normalizedBase);",
+          "const cookie = pm.collectionVariables.get('authCookie') || pm.environment.get('authCookie');",
+          "if (cookie && !pm.request.headers.has('Cookie')) {",
+          "  pm.request.headers.add({ key: 'Cookie', value: cookie });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\",\n  \"name\": \"John Doe\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/signup"
+          }
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cookieHeaders = pm.response.headers.all().filter((h) => h.key.toLowerCase() === 'set-cookie');",
+                  "const cookiePairs = cookieHeaders",
+                  "  .map((h) => h.value.split(';')[0])",
+                  "  .filter((value) => value.startsWith('sb-access-token=') || value.startsWith('sb-refresh-token='));",
+                  "if (cookiePairs.length > 0) {",
+                  "  const combined = cookiePairs.join('; ');",
+                  "  pm.collectionVariables.set('authCookie', combined);",
+                  "  pm.environment.set('authCookie', combined);",
+                  "}",
+                  "pm.test('Login succeeds', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "POST /auth/forgot-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/forgot-password"
+          }
+        },
+        {
+          "name": "POST /auth/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NewPassword123\",\n  \"confirmPassword\": \"NewPassword123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/reset-password"
+          }
+        },
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "GET /profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/profile"
+          }
+        },
+        {
+          "name": "PATCH /profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"currency\": \"USD\",\n  \"avatar_url\": \"https://example.com/avatar.png\"\n}"
+            },
+            "url": "{{baseUrl}}/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "GET /dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/dashboard"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "GET /categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/categories?limit=50&offset=0"
+          }
+        },
+        {
+          "name": "POST /categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Food\",\n  \"icon\": \"utensils\",\n  \"color\": \"#f97316\"\n}"
+            },
+            "url": "{{baseUrl}}/categories"
+          }
+        },
+        {
+          "name": "GET /categories/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/categories/{{categoryId}}"
+          }
+        },
+        {
+          "name": "PATCH /categories/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Groceries\",\n  \"color\": \"#22c55e\"\n}"
+            },
+            "url": "{{baseUrl}}/categories/{{categoryId}}"
+          }
+        },
+        {
+          "name": "DELETE /categories/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/categories/{{categoryId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "GET /transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/transactions?limit=50&offset=0&type=expense"
+          }
+        },
+        {
+          "name": "POST /transactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 42.5,\n  \"type\": \"expense\",\n  \"category_id\": \"{{categoryId}}\",\n  \"note\": \"Lunch\",\n  \"date\": \"2026-04-18\",\n  \"is_recurring\": false,\n  \"recurring_type\": \"none\",\n  \"tags\": []\n}"
+            },
+            "url": "{{baseUrl}}/transactions"
+          }
+        },
+        {
+          "name": "GET /transactions/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/transactions/{{transactionId}}"
+          }
+        },
+        {
+          "name": "PATCH /transactions/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Updated note\"\n}"
+            },
+            "url": "{{baseUrl}}/transactions/{{transactionId}}"
+          }
+        },
+        {
+          "name": "DELETE /transactions/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/transactions/{{transactionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Budgets",
+      "item": [
+        {
+          "name": "GET /budgets",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/budgets?month=2026-04"
+          }
+        },
+        {
+          "name": "POST /budgets",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": \"{{categoryId}}\",\n  \"limit_amount\": 500,\n  \"month\": \"2026-04\"\n}"
+            },
+            "url": "{{baseUrl}}/budgets"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plans",
+      "item": [
+        {
+          "name": "GET /plans/templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/plans/templates?month=2026-04"
+          }
+        },
+        {
+          "name": "POST /plans/templates",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Monthly Groceries\",\n  \"month\": \"2026-04\"\n}"
+            },
+            "url": "{{baseUrl}}/plans/templates"
+          }
+        },
+        {
+          "name": "GET /plans/items",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/plans/items"
+          }
+        },
+        {
+          "name": "POST /plans/items/:id/toggle-purchased",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checked\": true\n}"
+            },
+            "url": "{{baseUrl}}/plans/items/{{planItemId}}/toggle-purchased"
+          }
+        },
+        {
+          "name": "GET /plans/catalog",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/plans/catalog"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Loans",
+      "item": [
+        {
+          "name": "GET /loans",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/loans?status=active"
+          }
+        },
+        {
+          "name": "POST /loans",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Car Loan\",\n  \"total_amount\": 12000,\n  \"interest_rate\": 8.5,\n  \"monthly_installment\": 350,\n  \"start_date\": \"2026-01-01\",\n  \"due_day\": 5,\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{baseUrl}}/loans"
+          }
+        },
+        {
+          "name": "GET /loans/payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/loans/payments"
+          }
+        },
+        {
+          "name": "POST /loans/payments",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loan_id\": \"{{loanId}}\",\n  \"amount\": 350,\n  \"paid_on\": \"2026-04-18\",\n  \"note\": \"April installment\"\n}"
+            },
+            "url": "{{baseUrl}}/loans/payments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "GET /reports/summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{authCookie}}" }
+            ],
+            "url": "{{baseUrl}}/reports/summary?startDate=2026-04-01&endDate=2026-04-30&type=all&limit=250"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "authCookie",
+      "value": "sb-access-token=YOUR_ACCESS_TOKEN; sb-refresh-token=YOUR_REFRESH_TOKEN"
+    },
+    {
+      "key": "categoryId",
+      "value": "00000000-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "transactionId",
+      "value": "00000000-0000-0000-0000-000000000002"
+    },
+    {
+      "key": "loanId",
+      "value": "00000000-0000-0000-0000-000000000003"
+    },
+    {
+      "key": "planItemId",
+      "value": "00000000-0000-0000-0000-000000000004"
+    }
+  ]
+}
+
