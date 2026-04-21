@@ -1,0 +1,73 @@
+{
+  "users": [],
+  "categories": [],
+  "transactions": [],
+  "budgets": [],
+  "planTemplates": [],
+  "planItems": [],
+  "catalogItems": [
+    {
+      "id": "cb3f9405-8107-4961-9049-7de440a08136",
+      "groupNameBn": "শস্য ও তেল",
+      "groupNameEn": "Grains & Oils",
+      "itemNameBn": "চাল (নাজিরশাইল/মিনিকেট)",
+      "itemNameEn": "Rice",
+      "defaultUnit": "kg",
+      "sortOrder": 10,
+      "createdAt": "2026-04-19T17:11:21.643Z"
+    },
+    {
+      "id": "15c9b1c1-1907-4cb2-8f23-fbfcd0a21419",
+      "groupNameBn": "শস্য ও তেল",
+      "groupNameEn": "Grains & Oils",
+      "itemNameBn": "সয়াবিন তেল",
+      "itemNameEn": "Soybean oil",
+      "defaultUnit": "liter",
+      "sortOrder": 30,
+      "createdAt": "2026-04-19T17:11:21.644Z"
+    },
+    {
+      "id": "804a2004-354a-464b-864c-225ed385d112",
+      "groupNameBn": "প্রোটিন ও ডেইরি",
+      "groupNameEn": "Protein & Dairy",
+      "itemNameBn": "ডিম",
+      "itemNameEn": "Egg",
+      "defaultUnit": "pcs",
+      "sortOrder": 100,
+      "createdAt": "2026-04-19T17:11:21.644Z"
+    },
+    {
+      "id": "83423747-69b1-4034-baac-12c9cec4e8e0",
+      "groupNameBn": "প্রোটিন ও ডেইরি",
+      "groupNameEn": "Protein & Dairy",
+      "itemNameBn": "মুরগি",
+      "itemNameEn": "Chicken",
+      "defaultUnit": "kg",
+      "sortOrder": 110,
+      "createdAt": "2026-04-19T17:11:21.644Z"
+    },
+    {
+      "id": "61f6f6ac-3c8d-49c5-a5b7-6d5a70b4c1c4",
+      "groupNameBn": "মসলা ও নিত্যপ্রয়োজনীয়",
+      "groupNameEn": "Spices & Basics",
+      "itemNameBn": "পেঁয়াজ",
+      "itemNameEn": "Onion",
+      "defaultUnit": "kg",
+      "sortOrder": 140,
+      "createdAt": "2026-04-19T17:11:21.644Z"
+    },
+    {
+      "id": "11cca8b3-d69b-49af-9080-80157c7624ab",
+      "groupNameBn": "সবজি ও ফল",
+      "groupNameEn": "Produce & Fruits",
+      "itemNameBn": "আলু",
+      "itemNameEn": "Potato",
+      "defaultUnit": "kg",
+      "sortOrder": 240,
+      "createdAt": "2026-04-19T17:11:21.644Z"
+    }
+  ],
+  "loans": [],
+  "loanPayments": [],
+  "revokedJtis": []
+}

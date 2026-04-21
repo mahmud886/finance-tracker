@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +12,41 @@ import {
   signInSchema,
   signUpSchema,
 } from "@/lib/validations/auth";
+
+async function exchangeBackendToken(supabaseAccessToken: string) {
+  const baseApiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseApiUrl) {
+    throw new Error("NEXT_PUBLIC_API_URL is required to exchange backend auth token");
+  }
+
+  const response = await fetch(`${baseApiUrl}/auth/exchange`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ accessToken: supabaseAccessToken }),
+    cache: "no-store",
+  });
+
+  const payload = (await response.json()) as {
+    success?: boolean;
+    data?: { token?: string };
+    error?: { message?: string };
+  };
+
+  if (!response.ok || !payload?.success || !payload.data?.token) {
+    throw new Error(payload?.error?.message ?? "Failed to create backend access token");
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set("ft_api_token", payload.data.token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+}
 
 export async function signInAction(_: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = signInSchema.safeParse({
@@ -23,10 +59,22 @@ export async function signInAction(_: ActionState, formData: FormData): Promise<
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  const supabaseAccessToken = data.session?.access_token;
+  if (!supabaseAccessToken) {
+    return { success: false, error: "Supabase session missing access token" };
+  }
+
+  try {
+    await exchangeBackendToken(supabaseAccessToken);
+  } catch (exchangeError) {
+    const message = exchangeError instanceof Error ? exchangeError.message : "Backend token exchange failed";
+    return { success: false, error: message };
   }
 
   revalidatePath("/dashboard");
@@ -105,6 +153,9 @@ export async function resetPasswordAction(_: ActionState, formData: FormData): P
 }
 
 export async function signOutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("ft_api_token");
+
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
